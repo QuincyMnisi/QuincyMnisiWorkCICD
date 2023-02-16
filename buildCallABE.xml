@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2018 Software AG, Darmstadt, Germany and/or its licensors
+    SPDX-License-Identifier: Apache-2.0
+    Licensed under the Apache License, Version 2.0 (the "License");
+    You may not use this file except in compliance with the License.
+    You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.                                                            
+ -->
+
+<project name="Build" default="buildWM" basedir=".">
+        
+        <property name="abeHome" value="${SAGHome}/common/AssetBuildEnvironment"/>
+        
+        <property name="abeBuildfileDir" value="master_build"/>
+
+        <property name="abeBuildfileFile" value="build.xml"/>
+
+	<property name="abeBuildPropertiesReference" value="master_build_Reference/build.properties"/>
+
+
+
+	<target name="buildWM" description="build project" depends="cleanupBuild, prepareABEproperties">				
+		<echo>invoke ABE Build</echo>					
+		<ant antfile="${abeBuildfileFile}" dir="${abeHome}/${abeBuildfileDir}" target="build"/>
+	</target>
+	
+	<target name="cleanupBuild">			
+		<if>
+			<available file="${buildOutputDir}" type="dir"/>
+			<then>
+				<delete includeemptydirs="true">
+					<fileset dir="${buildOutputDir}" includes="**/*"/>
+				</delete>	
+			</then>
+		</if>
+	</target>
+	
+	<target name="prepareABEproperties">			
+		<if>
+			<not>
+				<available file="${abeHome}/${abeBuildfileDir}/build.properties.original" type="file"/>
+			</not>
+			<then>
+				<!-- back up the original if not back up is being made -->
+				<move file="${abeHome}/${abeBuildfileDir}/build.properties" tofile="${abeHome}/${abeBuildfileDir}/build.properties.original"/>
+			</then>
+		</if>
+				
+		<!-- move build.properties from SVN to the target ABE folder -->
+		<copy file="${abeBuildPropertiesReference}" tofile="${abeHome}/${abeBuildfileDir}/build.properties" overwrite="true"/>		
+	</target>
+	
+	
+</project>
